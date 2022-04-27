@@ -57,6 +57,19 @@ init_repo() {
     git checkout -b dummy
   fi
 
+  # If TAR_URL isn't set, check for an SSH_URL
+  if [ -n "${SSH_URL-}" ]; then
+    git clone "${SSH_URL}" .
+
+    git add .
+    gitcmd="git commit"
+    if [ -n "${GPG_KEYFILE-}" ]; then
+      gitcmd="$gitcmd -S"
+    fi
+    $gitcmd -m "init"
+    git checkout -b dummy
+  fi
+
   cd /git-server/repos
   chown -R git:git .
   chmod -R ug+rwX .
@@ -67,7 +80,7 @@ if [ ! -d "${REPO_DIR}" ]; then
   init_repo
 else
   # When download fails, this script restarts but we end up without any commits
-  if [ -n "${TAR_URL}" ] && [ "$(git rev-list --count HEAD --git-dir="${REPO_DIR}/.git")" -eq 0 ]; then
+  if [ -n "${SSH_URL}" ] | [ -n "${TAR_URL}" ] && [ "$(git rev-list --count HEAD --git-dir="${REPO_DIR}/.git")" -eq 0 ]; then
     rm -rf "${REPO_DIR}"
     init_repo
   fi
