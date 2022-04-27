@@ -64,6 +64,35 @@ patches:
 EOF
 ```
 
+Create a kustomization and set `SSL_URL`:
+
+```bash
+cat > kustomization.yaml <<EOF
+bases:
+  - github.com/fluxcd/gitsrv/deploy
+patches:
+- target:
+    kind: Deployment
+    name: gitsrv
+  patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: gitsrv
+    spec:
+      template:
+        spec:
+          containers:
+          - name: gitsrv
+            env:
+            - name: REPO
+              value: "cluster.git"
+            - name: SSH_URL
+              value: "git@gitlab.com:someUsername/cluster.git"
+
+EOF
+```
+
 Deploy the git server:
 
 ```bash
