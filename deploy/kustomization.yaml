@@ -4,5 +4,5 @@ resources:
 - deployment.yaml
 - service.yaml
 images:
-  - name: fluxcd/gitsrv
+  - name: mgrimberg/gitsrv
     newTag: v1.0.0

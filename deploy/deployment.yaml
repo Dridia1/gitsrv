@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: git
-          image: fluxcd/gitsrv:latest
+          image: mgrimberg/gitsrv:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: REPO
