@@ -21,8 +21,8 @@ spec:
           env:
             - name: REPO
               value: "cluster.git"
-            - name: TAR_URL
-              value: "https://github.com/fluxcd/flux-get-started/archive/master.tar.gz"
+#            - name: TAR_URL
+#              value: "https://github.com/fluxcd/flux-get-started/archive/master.tar.gz"
           ports:
             - containerPort: 22
               name: ssh
