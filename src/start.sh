@@ -2,13 +2,13 @@
 
 # If there is some public key in keys folder
 # then it copies its contain in authorized_keys file
-if [ "$(ls -A /git-server/keys/)" ]; then
-  cd /home/git
-  cat /git-server/keys/*.pub > .ssh/authorized_keys
-  chown -R git:git .ssh
-  chmod 700 .ssh
-  chmod -R 600 .ssh/*
-fi
+#if [ "$(ls -A /git-server/keys/)" ]; then
+#  cd /home/git
+#  cat /git-server/keys/*.pub > .ssh/authorized_keys
+#  chown -R git:git .ssh
+#  chmod 700 .ssh
+#  chmod -R 600 .ssh/*
+#fi
 
 # Set permissions
 if [ "$(ls -A /git-server/repos/)" ]; then
@@ -39,21 +39,8 @@ init_repo() {
   cd "${REPO_DIR}"
   git init --shared=true
 
-  if [ -n "${SSH_URL-}" ]; then
-
-    GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone ${SSH_URL} .
-
-    git add .
-    gitcmd="git commit"
-    if [ -n "${GPG_KEYFILE-}" ]; then
-      gitcmd="$gitcmd -S"
-    fi
-    $gitcmd -m "init"
-    git checkout -b dummy
-  fi
-
-  if [ -n "${TAR_URL-}" ]; then
-    while ! curl --verbose --location --fail "${TAR_URL}" | tar xz -C "./" --strip-components=1; do
+  if [ -n "${TAR_URL}" ]; then
+    while ! curl --verbose --header "PRIVATE-TOKEN: ${TAR_TOKEN}" --location --fail "${TAR_URL}" | tar xz -C "./" --strip-components=1; do
       sleep 1
     done
 
@@ -76,7 +63,7 @@ if [ ! -d "${REPO_DIR}" ]; then
   init_repo
 else
   # When download fails, this script restarts but we end up without any commits
-  if [ -n "${SSH_URL}" ] | [ -n "${TAR_URL}" ] && [ "$(git rev-list --count HEAD --git-dir="${REPO_DIR}/.git")" -eq 0 ]; then
+  if [ -n "${TAR_URL}" ] && [ "$(git rev-list --count HEAD --git-dir="${REPO_DIR}/.git")" -eq 0 ]; then
     rm -rf "${REPO_DIR}"
     init_repo
   fi
