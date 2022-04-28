@@ -18,6 +18,8 @@ RUN sh -c "echo git:${password:-ratherchangeme} |chpasswd"
 COPY src/sshd_config /etc/ssh/sshd_config
 COPY src/start.sh start.sh
 
+RUN cat start.sh
+
 EXPOSE 22
 
 CMD ["sh", "start.sh"]
