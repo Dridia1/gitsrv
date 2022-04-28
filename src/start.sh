@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-set +x
-set -o errexit
-set -o pipefail
-set -o nounset
 
 # If there is some public key in keys folder
 # then it copies its contain in authorized_keys file
@@ -43,10 +39,9 @@ init_repo() {
   cd "${REPO_DIR}"
   git init --shared=true
 
-  if [ -n "${TAR_URL-}" ]; then
-    while ! curl --verbose --location --fail "${TAR_URL}" | tar xz -C "./" --strip-components=1; do
-      sleep 1
-    done
+  if [ -n "${SSH_URL-}" ]; then
+
+    GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone ${SSH_URL} .
 
     git add .
     gitcmd="git commit"
@@ -57,9 +52,10 @@ init_repo() {
     git checkout -b dummy
   fi
 
-  # If TAR_URL isn't set, check for an SSH_URL
-  if [ -n "${SSH_URL-}" ]; then
-    git clone "${SSH_URL}" .
+  if [ -n "${TAR_URL-}" ]; then
+    while ! curl --verbose --location --fail "${TAR_URL}" | tar xz -C "./" --strip-components=1; do
+      sleep 1
+    done
 
     git add .
     gitcmd="git commit"
